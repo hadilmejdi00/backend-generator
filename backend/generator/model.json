@@ -1,0 +1,7 @@
+{
+  "modelName": "Product",
+  "fields": {
+    "title": "String",
+    "price": "Number"
+  }
+}
