@@ -1,7 +1,7 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Zap, ArrowLeft, Download, Folder, FileCode, ChevronRight } from 'lucide-react';
+import { Zap, ArrowLeft, Download, Folder, FileCode, ChevronRight, CheckCircle } from 'lucide-react';
 import { generateProject } from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -59,12 +59,97 @@ const LayerCard = ({ title, color, files, description }) => (
   </motion.div>
 );
 
+const GenerationProgress = ({ steps, currentStep }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="bg-card border border-border rounded-xl p-6 mb-6"
+  >
+    <h3 className="text-white font-semibold mb-4 text-center">
+      ⚙️ Génération en cours...
+    </h3>
+    <div className="space-y-3">
+      {steps.map((step, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: index * 0.1 }}
+          className="flex items-center gap-3"
+        >
+          <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+            index < currentStep ? 'bg-green-500' :
+            index === currentStep ? 'bg-primary animate-pulse' :
+            'bg-border'
+          }`}>
+            {index < currentStep ? (
+              <CheckCircle size={14} className="text-white" />
+            ) : (
+              <span className="text-white text-xs">{index + 1}</span>
+            )}
+          </div>
+          <span className={`text-sm ${
+            index < currentStep ? 'text-green-400' :
+            index === currentStep ? 'text-primary' :
+            'text-gray-500'
+          }`}>
+            {step}
+          </span>
+          {index === currentStep && (
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+              className="ml-auto"
+            >
+              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full" />
+            </motion.div>
+          )}
+          {index < currentStep && (
+            <span className="ml-auto text-green-400 text-xs">✅</span>
+          )}
+        </motion.div>
+      ))}
+    </div>
+
+    {/* Progress bar globale */}
+    <div className="mt-4">
+      <div className="bg-dark border border-border rounded-full h-2 overflow-hidden">
+        <motion.div
+          className="h-full bg-gradient-to-r from-primary to-purple-400 rounded-full"
+          initial={{ width: 0 }}
+          animate={{ width: `${(currentStep / steps.length) * 100}%` }}
+          transition={{ duration: 0.3 }}
+        />
+      </div>
+      <p className="text-gray-400 text-xs text-center mt-2">
+        {Math.round((currentStep / steps.length) * 100)}% complété
+      </p>
+    </div>
+  </motion.div>
+);
+
 const PreviewPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const model = location.state?.model;
-  const [loading, setLoading] = React.useState(false);
-  const [success, setSuccess] = React.useState(false);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [showProgress, setShowProgress] = useState(false);
+
+  const generationSteps = [
+    'Validation du modèle...',
+    'Génération des entités Domain...',
+    'Génération des interfaces Repository...',
+    'Génération des Use Cases...',
+    'Génération des Controllers...',
+    'Génération des Routes...',
+    'Génération des DTOs...',
+    'Génération de app.js...',
+    'Compression en ZIP...',
+    'Sauvegarde dans MongoDB...',
+    'Téléchargement...'
+  ];
 
   if (!model) {
     navigate('/generator');
@@ -78,16 +163,9 @@ const PreviewPage = () => {
       'app.js': 'file',
       'package.json': 'file',
       'README.md': 'file',
-      application: {
-        interfaces: {},
-        usecases: {},
-        dtos: {}
-      },
+      application: { interfaces: {}, usecases: {}, dtos: {} },
       domain: { entities: {} },
-      infrastructure: {
-        models: {},
-        repositories: {}
-      },
+      infrastructure: { models: {}, repositories: {} },
       interfaces: { controllers: {} },
       routes: {}
     };
@@ -144,16 +222,35 @@ const PreviewPage = () => {
     }
   ]);
 
+  const simulateProgress = async () => {
+    for (let i = 0; i <= generationSteps.length; i++) {
+      setCurrentStep(i);
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+  };
+
   const handleGenerate = async () => {
     setLoading(true);
+    setShowProgress(true);
+    setCurrentStep(0);
+
     const toastId = toast.loading('Génération en cours...');
+
     try {
+      // Simule la progression en parallèle
+      simulateProgress();
+
+      // Sauvegarde dans MongoDB
       await fetch('http://localhost:5000/api/project/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(model)
       });
+
+      // Génère et télécharge le ZIP
       await generateProject(model);
+
+      setCurrentStep(generationSteps.length);
       setSuccess(true);
       toast.success('Projet généré avec succès ! 🎉', { id: toastId });
     } catch (err) {
@@ -166,6 +263,7 @@ const PreviewPage = () => {
 
   return (
     <div className="min-h-screen bg-dark">
+      {/* Navbar */}
       <motion.nav
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -188,6 +286,7 @@ const PreviewPage = () => {
       </motion.nav>
 
       <div className="max-w-6xl mx-auto px-8 py-12">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -202,6 +301,7 @@ const PreviewPage = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* File Tree */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -220,6 +320,7 @@ const PreviewPage = () => {
             </div>
           </motion.div>
 
+          {/* Layers */}
           <div className="space-y-4">
             <motion.h2
               initial={{ opacity: 0 }}
@@ -237,23 +338,35 @@ const PreviewPage = () => {
           </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-10"
-        >
+        {/* Progress */}
+        <div className="mt-10">
+          <AnimatePresence>
+            {showProgress && (
+              <GenerationProgress
+                steps={generationSteps}
+                currentStep={currentStep}
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Success */}
           {success && (
-            <div className="bg-green-900/30 border border-green-500 text-green-400 rounded-xl p-4 mb-6 text-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-green-900/30 border border-green-500 text-green-400 rounded-xl p-4 mb-6 text-center"
+            >
               🎉 Projet généré et téléchargé avec succès !
-            </div>
+            </motion.div>
           )}
+
+          {/* Generate Button */}
           <motion.button
             whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(124,58,237,0.5)' }}
             whileTap={{ scale: 0.98 }}
             onClick={handleGenerate}
             disabled={loading}
-            className="w-full bg-gradient-to-r from-primary to-purple-500 text-white py-4 rounded-xl text-lg font-semibold flex items-center justify-center gap-3 disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-primary to-purple-500 text-white py-4 rounded-xl text-lg font-semibold flex items-center justify-center gap-3 disabled:opacity-50 transition-all"
           >
             {loading ? (
               <>
@@ -267,7 +380,7 @@ const PreviewPage = () => {
               </>
             )}
           </motion.button>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

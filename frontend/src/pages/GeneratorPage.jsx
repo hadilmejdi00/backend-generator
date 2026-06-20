@@ -177,6 +177,7 @@ const GeneratorPage = () => {
                         >
                           <option value="One-to-One">1-1 One-to-One</option>
                           <option value="One-to-Many">1-N One-to-Many</option>
+                          <option value="Many-to-Many">N-N Many-to-Many</option>
                         </motion.select>
                       )}
 

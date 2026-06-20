@@ -60,7 +60,7 @@ const Counter = ({ target, suffix = '' }) => {
 const HomePage = () => {
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
-  const [particlesLoaded, setParticlesLoaded] = useState(false);
+  const [, setParticlesLoaded] = useState(false);
   const containerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -76,6 +76,7 @@ const HomePage = () => {
     };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const particlesInit = useCallback(async (engine) => {
