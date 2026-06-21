@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Zap } from 'lucide-react';
 
 const SplashScreen = ({ onFinish }) => {
   const [progress, setProgress] = useState(0);
   const [text, setText] = useState('Initialisation...');
 
-  const messages = [
-    'Initialisation...',
-    'Chargement de l\'architecture...',
-    'Préparation du générateur...',
-    'Connexion à la base de données...',
-    'Prêt !'
-  ];
-
   useEffect(() => {
+    const messages = [
+      'Initialisation...',
+      'Chargement de l\'architecture...',
+      'Préparation du générateur...',
+      'Connexion à la base de données...',
+      'Prêt !'
+    ];
+
     let current = 0;
     const interval = setInterval(() => {
       current += 20;
@@ -26,6 +26,7 @@ const SplashScreen = ({ onFinish }) => {
       }
     }, 400);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
