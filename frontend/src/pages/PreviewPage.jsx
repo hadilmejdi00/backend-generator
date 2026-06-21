@@ -5,6 +5,8 @@ import { Zap, ArrowLeft, Download, Folder, FileCode, ChevronRight, CheckCircle }
 import { generateProject } from '../services/api';
 import toast from 'react-hot-toast';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 const FileTree = ({ structure, depth = 0 }) => {
   return (
     <div style={{ marginLeft: depth * 20 }}>
@@ -241,7 +243,7 @@ const PreviewPage = () => {
       simulateProgress();
 
       // Sauvegarde dans MongoDB
-      await fetch('http://localhost:5000/api/project/save', {
+      await fetch(`${API_URL}/api/project/save`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(model)

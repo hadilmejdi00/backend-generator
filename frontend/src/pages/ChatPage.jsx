@@ -4,6 +4,8 @@ import { Send, Zap, ArrowLeft, Bot, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { generateProject } from '../services/api';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 const ChatPage = () => {
   const navigate = useNavigate();
   const [messages, setMessages] = useState([
@@ -30,7 +32,7 @@ const ChatPage = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/chat/message', {
+      const response = await fetch(`${API_URL}/api/chat/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

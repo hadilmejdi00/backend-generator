@@ -5,6 +5,8 @@ import { Zap, ArrowLeft, Trash2, Download, Clock, Layers, Plus } from 'lucide-re
 import toast from 'react-hot-toast';
 import { generateProject } from '../services/api';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 const DashboardPage = () => {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
@@ -16,7 +18,7 @@ const DashboardPage = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/project');
+      const response = await fetch(`${API_URL}/api/project`);
       const data = await response.json();
       setProjects(data);
     } catch (err) {
@@ -28,7 +30,7 @@ const DashboardPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:5000/api/project/${id}`, {
+      await fetch(`${API_URL}/api/project/${id}`, {
         method: 'DELETE'
       });
       setProjects(projects.filter(p => p._id !== id));
