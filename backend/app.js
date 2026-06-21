@@ -23,7 +23,10 @@ app.use(limiter);
 
 // ---------- Middlewares ----------
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: [
+    'http://localhost:3000',
+    'https://backend-generator-hadil.vercel.app'
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 app.use(express.json());
