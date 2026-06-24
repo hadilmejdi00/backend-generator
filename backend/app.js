@@ -25,7 +25,11 @@ app.use(limiter);
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    if (origin.includes('vercel.app') || origin === 'http://localhost:3000') {
+    if (
+      origin.includes('vercel.app') || 
+      origin.includes('onrender.com') || // ⭐ AJOUTÉ pour Render
+      origin === 'http://localhost:3000'
+    ) {
       return callback(null, true);
     }
     return callback(new Error('Not allowed by CORS'));
