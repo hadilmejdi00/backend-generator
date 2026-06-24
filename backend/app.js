@@ -27,7 +27,7 @@ app.use(cors({
     if (!origin) return callback(null, true);
     if (
       origin.includes('vercel.app') || 
-      origin.includes('onrender.com') || // ⭐ AJOUTÉ pour Render
+      origin.includes('onrender.com') || // ⭐ CORRECTION : onrender.com au lieu de l'URL entière
       origin === 'http://localhost:3000'
     ) {
       return callback(null, true);
