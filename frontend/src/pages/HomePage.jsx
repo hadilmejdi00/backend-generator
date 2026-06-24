@@ -1,39 +1,10 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
-import { Zap, Code, Download, Brain, ArrowRight, LogOut, CheckCircle, Layers, GitBranch, Sun, Moon } from 'lucide-react';
+import { Code, Download, Brain, ArrowRight, LogOut, CheckCircle, Layers, GitBranch, Sun, Moon, Shield, Database, TestTube, FileCode2, MessageCircle, Zap as ZapIcon } from 'lucide-react';
 import Particles from '@tsparticles/react';
 import { loadSlim } from '@tsparticles/slim';
 import { useTheme } from '../context/ThemeContext';
-
-const TypeWriter = ({ text, delay = 0 }) => {
-  const [displayed, setDisplayed] = useState('');
-  const [index, setIndex] = useState(0);
-  const [started, setStarted] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setStarted(true), delay * 1000);
-    return () => clearTimeout(timer);
-  }, [delay]);
-
-  useEffect(() => {
-    if (!started) return;
-    if (index < text.length) {
-      const timer = setTimeout(() => {
-        setDisplayed(prev => prev + text[index]);
-        setIndex(prev => prev + 1);
-      }, 50);
-      return () => clearTimeout(timer);
-    }
-  }, [index, started, text]);
-
-  return (
-    <span>
-      {displayed}
-      {index < text.length && <span className="animate-pulse text-primary">|</span>}
-    </span>
-  );
-};
 
 const Counter = ({ target, suffix = '' }) => {
   const [count, setCount] = useState(0);
@@ -99,7 +70,7 @@ const HomePage = () => {
       action: () => navigate('/generator')
     },
     {
-      icon: <Zap size={28} />,
+      icon: <ZapIcon size={28} />,
       title: 'Génération Instantanée',
       description: 'Crée ton backend complet en quelques secondes avec toutes les couches',
       color: '#6D28D9',
@@ -146,6 +117,26 @@ const HomePage = () => {
       description: 'Commence à coder sans perdre de temps sur la structure',
       icon: <CheckCircle size={24} />
     }
+  ];
+
+  const techStack = [
+    { name: 'React.js', color: '#61DAFB' },
+    { name: 'Express.js', color: '#7C3AED' },
+    { name: 'MongoDB', color: '#47A248' },
+    { name: 'Gemini AI', color: '#4285F4' },
+    { name: 'JWT', color: '#F59E0B' },
+    { name: 'Tailwind', color: '#06B6D4' },
+    { name: 'Jest', color: '#C21325' },
+    { name: 'Swagger', color: '#85EA2D' },
+  ];
+
+  const architectureStats = [
+    { icon: <Layers size={22} />, value: 4, label: 'Couches Clean Architecture', color: '#7C3AED' },
+    { icon: <FileCode2 size={22} />, value: 11, label: 'Méthodes de génération', color: '#6D28D9' },
+    { icon: <Shield size={22} />, value: 4, label: 'Niveaux de sécurité', color: '#5B21B6' },
+    { icon: <TestTube size={22} />, value: 10, label: 'Tests unitaires Jest', color: '#4C1D95' },
+    { icon: <Database size={22} />, value: 2, label: 'Types de relations', color: '#7C3AED' },
+    { icon: <Code size={22} />, value: 5, label: 'Use Cases par entité', color: '#6D28D9' },
   ];
 
   return (
@@ -205,78 +196,92 @@ const HomePage = () => {
               animate={{ rotate: [0, 15, -15, 0] }}
               transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
             >
-              <Zap className="text-primary" size={28} />
+              <ZapIcon className="text-primary" size={28} />
             </motion.div>
             <span className="text-xl font-bold text-white">BackendGen</span>
           </div>
-          <div className="flex items-center gap-3">
+
+          <div className="flex items-center gap-5">
             {user.name && (
-              <span className="text-gray-400 text-sm">👋 {user.name}</span>
+              <span className="text-gray-400 text-sm hidden md:flex items-center gap-1.5">
+                {user.name}
+              </span>
             )}
-            {/* Theme Toggle */}
+
+            <div className="w-px h-6 bg-border hidden md:block" />
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={toggleTheme}
-              className="border border-border text-gray-400 hover:text-white p-2 rounded-lg transition-all duration-200"
+              className="border border-border text-gray-400 hover:text-white w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200"
             >
-              {isDark ? <Sun size={18} /> : <Moon size={18} />}
+              {isDark ? <Sun size={17} /> : <Moon size={17} />}
             </motion.button>
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/dashboard')}
-              className="border border-primary text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-lg transition-all duration-200 text-sm"
+              className="border border-border text-gray-300 hover:border-primary hover:text-primary px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium hidden sm:flex items-center gap-2"
             >
-              📊 Dashboard
+              <Layers size={16} />
+              Dashboard
             </motion.button>
+
             <motion.button
-              whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(124,58,237,0.6)' }}
+              whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(124,58,237,0.5)' }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/generator')}
-              className="bg-primary text-white px-6 py-2 rounded-lg transition-all duration-200"
+              className="bg-primary hover:bg-secondary text-white px-5 py-2 rounded-lg transition-all duration-200 text-sm font-medium"
             >
               Commencer
             </motion.button>
+
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, color: '#EF4444' }}
               whileTap={{ scale: 0.95 }}
               onClick={handleLogout}
-              className="border border-red-500 text-red-400 hover:bg-red-500 hover:text-white px-4 py-2 rounded-lg transition-all duration-200 text-sm flex items-center gap-2"
+              className="text-gray-500 hover:text-red-400 w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200"
+              title="Déconnexion"
             >
-              <LogOut size={16} />
-              Déconnexion
+              <LogOut size={18} />
             </motion.button>
           </div>
         </motion.nav>
 
-        {/* Hero */}
+        {/* Hero — refait, sobre */}
         <div className="flex flex-col items-center justify-center text-center px-8 py-20">
 
-          {/* Badge */}
+          {/* Badge unique discret */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, type: 'spring' }}
-            className="bg-primary/20 border border-primary/40 text-primary px-4 py-2 rounded-full text-sm font-medium mb-8"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-full mb-7"
           >
-            ✨ Générateur Automatique de Backend
+            <motion.span
+              className="w-1.5 h-1.5 bg-green-400 rounded-full flex-shrink-0"
+              animate={{ opacity: [1, 0.3, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+            <span className="text-gray-400 text-sm">Déployé en production</span>
           </motion.div>
 
           {/* Title */}
           <motion.h1
-            initial={{ opacity: 0, y: -40 }}
+            initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-7xl font-bold text-white mb-6 leading-tight"
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="text-6xl font-bold text-white mb-6 leading-tight tracking-tight"
           >
-            Génère ton Backend
+            Génère ton backend
             <br />
             <span
               className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-primary"
               style={{ filter: 'drop-shadow(0 0 30px rgba(124,58,237,0.5))' }}
             >
-              <TypeWriter text="Clean Architecture" delay={0.8} />
+              Clean Architecture
             </span>
           </motion.h1>
 
@@ -284,70 +289,92 @@ const HomePage = () => {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.7, delay: 0.5 }}
-            className="text-gray-400 text-xl mb-10 max-w-2xl"
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="text-gray-400 text-lg mb-9 max-w-xl"
           >
-            Définis tes entités métier et génère automatiquement un backend complet
-            respectant les principes SOLID et Clean Architecture
+            Définis tes entités métier et génère automatiquement un backend complet respectant les principes SOLID
           </motion.p>
 
-          {/* Buttons */}
+          {/* Buttons — sans emoji */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.7 }}
-            className="flex gap-4 justify-center mb-16"
+            transition={{ duration: 0.7, delay: 0.5 }}
+            className="flex gap-3 justify-center mb-16"
           >
             <motion.button
-              whileHover={{ scale: 1.07, boxShadow: '0 0 35px rgba(124,58,237,0.7)' }}
+              whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(124,58,237,0.6)' }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/generator')}
-              className="bg-gradient-to-r from-primary to-purple-500 text-white px-10 py-4 rounded-xl text-lg font-semibold flex items-center gap-2 shadow-lg shadow-primary/30"
+              className="bg-primary hover:bg-secondary text-white px-7 py-3.5 rounded-xl text-base font-medium flex items-center gap-2 transition-all duration-200"
             >
-              🚀 Générer mon Backend
-              <motion.div animate={{ x: [0, 5, 0] }} transition={{ duration: 1, repeat: Infinity }}>
-                <ArrowRight size={20} />
-              </motion.div>
+              Générer mon backend
+              <ArrowRight size={18} />
             </motion.button>
 
             <motion.button
-              whileHover={{ scale: 1.07, boxShadow: '0 0 35px rgba(124,58,237,0.4)' }}
+              whileHover={{ scale: 1.05, borderColor: '#7C3AED', color: '#A78BFA' }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/chat')}
-              className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-10 py-4 rounded-xl text-lg font-semibold transition-all duration-300 flex items-center gap-2"
+              className="border border-border text-gray-300 px-7 py-3.5 rounded-xl text-base font-medium transition-all duration-200 flex items-center gap-2"
             >
-              🤖 Utiliser l'IA
+              <MessageCircle size={18} />
+              Utiliser l'IA
             </motion.button>
           </motion.div>
 
-          {/* Stats */}
+          {/* Stats — séparées par traits verticaux */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.7, delay: 0.9 }}
-            className="flex gap-16 mb-20"
+            transition={{ duration: 0.7, delay: 0.7 }}
+            className="flex items-center gap-10 mb-20"
           >
             {[
               { value: 100, suffix: '%', label: 'Clean Architecture' },
               { value: 10, suffix: '+', label: 'Fichiers générés' },
-              { value: 5, suffix: ' sec', label: 'Temps de génération' },
+              { value: 5, suffix: 's', label: 'Temps de génération' },
             ].map((stat, index) => (
-              <motion.div
-                key={index}
-                whileHover={{ scale: 1.1 }}
-                className="text-center"
-              >
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.5, delay: 1 + index * 0.1, type: 'spring' }}
-                  className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-primary"
-                >
-                  <Counter target={stat.value} suffix={stat.suffix} />
-                </motion.div>
-                <div className="text-gray-400 text-sm mt-1">{stat.label}</div>
-              </motion.div>
+              <React.Fragment key={index}>
+                {index > 0 && <div className="w-px h-10 bg-border" />}
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-white">
+                    <Counter target={stat.value} suffix={stat.suffix} />
+                  </div>
+                  <div className="text-gray-500 text-xs mt-0.5">{stat.label}</div>
+                </div>
+              </React.Fragment>
             ))}
+          </motion.div>
+
+          {/* Stack technique */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.9 }}
+            className="mb-20 w-full max-w-4xl"
+          >
+            <p className="text-gray-500 text-sm uppercase tracking-wider mb-4">
+              Stack technique utilisée
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              {techStack.map((tech, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1 + index * 0.05 }}
+                  whileHover={{ scale: 1.1, y: -3 }}
+                  className="bg-card/60 border border-border px-4 py-2 rounded-full flex items-center gap-2"
+                >
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: tech.color }}
+                  />
+                  <span className="text-gray-300 text-sm font-medium">{tech.name}</span>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
 
           {/* Features */}
@@ -357,7 +384,7 @@ const HomePage = () => {
                 key={index}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 1.1 + index * 0.15 }}
+                transition={{ duration: 0.6, delay: 1 + index * 0.15 }}
                 whileHover={{
                   scale: 1.05,
                   boxShadow: `0 0 30px ${feature.color}40`,
@@ -385,7 +412,7 @@ const HomePage = () => {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 1.5 }}
+            transition={{ duration: 0.7, delay: 1.4 }}
             className="max-w-6xl w-full mb-24"
           >
             <h2 className="text-4xl font-bold text-white text-center mb-4">
@@ -398,7 +425,7 @@ const HomePage = () => {
                   key={index}
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 1.7 + index * 0.15 }}
+                  transition={{ duration: 0.5, delay: 1.6 + index * 0.15 }}
                   whileHover={{ scale: 1.05, boxShadow: '0 0 25px rgba(124,58,237,0.2)' }}
                   className="bg-card/80 border border-border rounded-xl p-6 text-center relative"
                 >
@@ -416,6 +443,58 @@ const HomePage = () => {
             </div>
           </motion.div>
 
+          {/* Architecture en chiffres */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 1.7 }}
+            className="max-w-6xl w-full mb-24"
+          >
+            <h2 className="text-4xl font-bold text-white text-center mb-4">
+              L'architecture en <span className="text-primary">chiffres</span>
+            </h2>
+            <p className="text-gray-400 text-center mb-12">Une Clean Architecture rigoureuse et testée</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              {architectureStats.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 1.8 + index * 0.1 }}
+                  whileHover={{ scale: 1.05, boxShadow: `0 0 25px ${stat.color}30` }}
+                  className="bg-card/80 border border-border rounded-xl p-6 flex items-center gap-4"
+                >
+                  <div
+                    className="p-3 rounded-lg flex-shrink-0"
+                    style={{ backgroundColor: `${stat.color}20`, color: stat.color }}
+                  >
+                    {stat.icon}
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-white">
+                      <Counter target={stat.value} />
+                    </div>
+                    <div className="text-gray-400 text-xs">{stat.label}</div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Citation Clean Architecture */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 1.9 }}
+            className="max-w-3xl w-full mb-24 text-center"
+          >
+            <div className="text-6xl text-primary/20 font-serif mb-2">"</div>
+            <p className="text-2xl text-white font-medium italic mb-4">
+              Une bonne architecture permet aux décisions de se prendre le plus tard possible.
+            </p>
+            <p className="text-gray-500 text-sm">— Robert C. Martin, Clean Architecture</p>
+          </motion.div>
+
           {/* CTA */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -424,7 +503,7 @@ const HomePage = () => {
             className="max-w-3xl w-full bg-gradient-to-r from-primary/20 to-purple-900/20 border border-primary/30 rounded-2xl p-12 text-center mb-24"
           >
             <h2 className="text-3xl font-bold text-white mb-4">
-              Prêt à générer ton backend ? 🚀
+              Prêt à générer ton backend ?
             </h2>
             <p className="text-gray-400 mb-8">
               Commence maintenant et génère ton projet Clean Architecture en quelques secondes
@@ -448,7 +527,7 @@ const HomePage = () => {
             className="w-full border-t border-border pt-8 pb-4 text-center"
           >
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Zap className="text-primary" size={20} />
+              <ZapIcon className="text-primary" size={20} />
               <span className="text-white font-bold">BackendGen</span>
             </div>
             <p className="text-gray-500 text-sm">
